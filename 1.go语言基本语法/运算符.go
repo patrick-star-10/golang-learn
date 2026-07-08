@@ -124,7 +124,7 @@ func assign() {
 	fmt.Printf("第五行 - /= 运算符实例,c 的值为 %d\n", c) // 输出: 21
 
 	c %= a
-	fmt.Printf("第六行 - %= 运算符实例,c 的值为 %d\n", c) // 输出: 0
+	fmt.Printf("第六行 - %%= 运算符实例,c 的值为 %d\n", c) // 输出: 0
 
 	c <<= 2
 	fmt.Printf("第七行 - <<= 运算符实例,c 的值为 %d\n", c) // 输出: 0
