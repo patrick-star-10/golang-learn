@@ -46,3 +46,24 @@ func oddEven2() {
 		fmt.Println(num, "是奇数") // 不会执行
 	}
 }
+
+// if嵌套语句
+func nested() {
+	if score := 98; score >= 60 {
+		if score >= 70 {
+			if score >= 80 {
+				if score >= 90 {
+					fmt.Println("优秀") // 执行输出
+				} else {
+					fmt.Println("良好") // 不会执行
+				}
+			} else {
+				fmt.Println("中等") // 不会执行
+			}
+		} else {
+			fmt.Println("及格") // 不会执行
+		}
+	} else {
+		fmt.Println("不及格") // 不会执行
+	}
+}
