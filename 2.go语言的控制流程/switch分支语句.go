@@ -93,3 +93,4 @@ func TypeSwitch(x interface{}) {
 	}
 
 }
+
