@@ -1,5 +1,5 @@
 package main
 
 func main() {
-	anonymous1()
+	bibao()
 }
