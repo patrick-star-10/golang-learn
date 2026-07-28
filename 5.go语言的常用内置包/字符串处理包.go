@@ -8,7 +8,7 @@ import (
 // 字符串的遍历包括按照字节遍历和按字符遍历
 func Unicode() {
 	s := "我爱go语言"
-	fmt.Println("字节长度：", len(s))
+	fmt.Println("字节长度：", len(s)) //len()计算的是字节，不是字符，英文占1个字节，中文通常占3个字节
 	fmt.Println("-----------------")
 	// for...range遍历字符串
 	len := 0
@@ -32,5 +32,5 @@ func Unicode() {
 	}
 	fmt.Println()
 	fmt.Println("字符串长度：", count)
-	fmt.Println("字符串长度", utf8.RuneCountInString(s))
+	fmt.Println("字符串长度", utf8.RuneCountInString(s)) //获取字符串包含的 Unicode 字符数量
 }
