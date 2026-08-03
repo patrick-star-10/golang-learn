@@ -6,6 +6,7 @@ import (
 	"unicode"
 )
 
+// 常用字符串检索方法
 // ======== 包含判断（bool）========
 // func Contains(s, substr string) bool // 判断字符串 s 是否包含子字符串 substr
 // func ContainsAny(s, chars string) bool // 判断字符串 s 是否包含 chars 中任意一个字符
@@ -129,16 +130,230 @@ func TestLastIndexByte() {
 	fmt.Println(strings.LastIndexByte("abcABCA123", 'A')) // 6
 }
 
-// 返回字符串中满足函数f(r)==true的字符最后一次出现的位置
+// 返回字符串中满足函数f(r)==true的字符最后一次出现的位置（返回的是字节索引
 func TestLastIndexFunc() {
 	f := func(c rune) bool {
 		return unicode.Is(unicode.Han, c) // 判断是否是汉字
 	}
-	fmt.Println(strings.LastIndexFunc("Hello123中国", f)) // 8
+	fmt.Println(strings.LastIndexFunc("Hello,世界", f))       // 9
+	fmt.Println(strings.LastIndexFunc("Hello,world中国人", f)) // 17
 }
 
 // 获取文件后缀名
 func GetFileSuffix(fileName string) string {
 	arr := strings.Split(fileName, ".") // 以.分割字符串，返回一个切片
 	return arr[len(arr)-1]
+}
+
+// 分割字符串
+// func Fields(s string) []string // 按照空格分割字符串，返回一个切片
+// func FieldsFunc(s string, f func(rune) bool) []string // 按照函数f分割字符串，返回一个切片
+// func Split(s, sep string) []string // 按照指定的分隔符分割字符串，返回一个切片
+// func SplitAfter(s, sep string) []string // 按照指定的分隔符分割字符串，返回一个切片，保留分隔符
+// func SplitN(s, sep string, n int) []string // 按照指定的分隔符分割字符串，返回一个切片，最多分割n次
+// func SplitAfterN(s, sep string, n int) []string // 按照指定的分隔符分割字符串，返回一个切片，最多分割n次，保留分隔符
+
+func SplitString() {
+	TestFields()
+	TestFieldsFunc()
+	TestSplitAfterN()
+	TestSplit()
+	TestSplitAfter()
+	TestSplitN()
+}
+
+// 将字符串按照空格分割，返回一个切片
+func TestFields() {
+	fmt.Println(strings.Fields(" abc 123 ABC xyz XYZ")) // [abc 123 ABC xyz XYZ]
+}
+
+// 将字符串以满足函数f(r)==true的字符分割，返回一个切片
+func TestFieldsFunc() {
+	f := func(c rune) bool {
+		return !unicode.IsLetter(c) && !unicode.IsNumber(c) // 判断是否是字母或数字
+	} // 不是字母或数字的字符都作为分隔符
+	fmt.Println(strings.FieldsFunc(" abc@123*ABC&xyz%XYZ", f)) // [abc 123 ABC xyz XYZ]
+}
+
+// 将字符串以sep分割，分割后字符最后去掉sep
+func TestSplit() {
+	fmt.Printf("%q\n", strings.Split("a,b,c", ","))                        // ["a" "b" "c"]
+	fmt.Printf("%q\n", strings.Split("a man a plan a canal panama", "a ")) // ["a man " "plan " "canal panama"]
+	fmt.Printf("%q\n", strings.Split(" xyz ", ""))                         // [" " "x" "y" "z" " "]
+	fmt.Printf("%q\n", strings.Split("", "Bernardo O'Higgins"))            // [""]
+}
+
+// 将字符串s以sep作为分隔符分割，分割后字符最后附上sep,n决定返回的切片数
+func TestSplitN() {
+	fmt.Printf("%q\n", strings.SplitN("a,b,c", ",", 2)) // ["a" "b,c"]
+	fmt.Printf("%q\n", strings.SplitN("a,b,c", ",", 1)) // ["a,b,c"]
+}
+
+// 将字符串s以sep作为分隔符分割，分割后字符最后附上sep
+func TestSplitAfter() {
+	fmt.Printf("%q\n", strings.SplitAfter("a,b,c", ",")) // ["a," "b," "c"]
+}
+
+// 将字符串s以sep作为分隔符分割，分割后字符最后附上sep,n决定返回的切片数
+func TestSplitAfterN() {
+	fmt.Printf("%q\n", strings.SplitAfterN("a,b,c", ",", 2)) // ["a," "b,c"]
+}
+
+// 大小写转化
+// func Title(s string) string // 将字符串s的首字母大写，其余小写
+// func ToLower(s string) string // 将字符串s转化为小写
+// func ToLowerSpecial(s string, caseMapping unicode.SpecialCase) string // 将字符串s转化为小写，使用指定的大小写映射规则
+// func ToTitle(s string) string // 将字符串s转化为大写
+// func ToTitleSpecial(s string, caseMapping unicode.SpecialCase) string // 将字符串s转化为大写，使用指定的大小写映射规则
+// func ToUpper(s string) string // 将字符串s转化为大写
+// func ToUpperSpecial(s string, caseMapping unicode.SpecialCase) string // 将字符串s转化为大写，使用指定的大小写映射规则
+
+func UpLower() {
+	TestTitle()
+	TestToTitle()
+	TestToLower()
+	TestToUpper()
+}
+
+// 将字符串s每个单词的首字母大写，其余小写
+func TestTitle() {
+	fmt.Println(strings.Title("her name is steven")) // Her Name Is Steven
+}
+
+// 将字符串s转化为大写
+func TestToTitle() {
+	fmt.Println(strings.ToTitle("louD noises")) // LOUD NOISES
+}
+
+// 将字符串s转化为小写
+func TestToLower() {
+	fmt.Println(strings.ToLower("Gopher")) // gopher
+}
+
+// 将字符串s转化为大写
+func TestToUpper() {
+	fmt.Println(strings.ToUpper("Gopher")) // GOPHER
+}
+
+// 修建字符串
+// func Trim(s string, cutset string) string // 去掉字符串s首尾的cutset中的字符
+// func TrimFunc(s string, f func(rune) bool) string // 去掉字符串s首尾满足函数f(r)==true的字符
+// func TrimLeft(s string, cutset string) string // 去掉字符串s左边的cutset中的字符
+// func TrimLeftFunc(s string, f func(rune) bool) string // 去掉字符串s左边满足函数f(r)==true的字符
+// func TrimPrefix(s, prefix string) string // 去掉字符串s的前缀prefix
+// func TrimRight(s string, cutset string) string // 去掉字符串s右边的cutset中的字符
+// func TrimRightFunc(s string, f func(rune) bool) string // 去掉字符串s右边满足函数f(r)==true的字符
+// func TrimSpace(s string) string // 去掉字符串s首尾的空格
+// func TrimSuffix(s, suffix string) string // 去掉字符串s的后缀suffix
+func TrimString() {
+	TestTrim()
+	TestTrimFunc()
+	TestTrimLeft()
+	TestTrimLeftFunc()
+	TestTrimPrefix()
+	TestTrimRight()
+	TestTrimRightFunc()
+	TestTrimSpace()
+	TestTrimSuffix()
+}
+
+// 将字符串s首尾的cutset中的字符去掉
+func TestTrim() {
+	fmt.Println(strings.Trim(" steven wang ", " ")) // steven wang
+}
+
+// 将字符串s首尾满足函数f(r)==true的字符去掉
+func TestTrimFunc() {
+	f := func(c rune) bool {
+		return !unicode.IsLetter(c) && !unicode.IsNumber(c) // 判断是否是字母或数字
+	}
+	fmt.Println(strings.TrimFunc("!@#$%steven wang%$#@!", f)) // steven wang
+}
+
+// 将字符串s左边的cutset中的字符去掉
+func TestTrimLeft() {
+	fmt.Println(strings.TrimLeft(" steven wang ", " ")) // steven wang
+}
+
+// 将字符串s左边满足函数f(r)==true的字符去掉
+func TestTrimLeftFunc() {
+	f := func(c rune) bool {
+		return !unicode.IsLetter(c) && !unicode.IsNumber(c) // 判断是否是字母或数字
+	}
+	fmt.Println(strings.TrimLeftFunc("!@#$%steven wang%$#@!", f)) // steven wang%$#@!
+}
+
+// 将字符串s右边的cutset中的字符去掉
+func TestTrimRight() {
+	fmt.Println(strings.TrimRight(" steven wang ", " ")) // steven wang
+}
+
+// 将字符串s右边满足函数f(r)==true的字符去掉
+func TestTrimRightFunc() {
+	f := func(c rune) bool {
+		return !unicode.IsLetter(c) && !unicode.IsNumber(c) // 判断是否是字母或数字
+	}
+	fmt.Println(strings.TrimRightFunc("!@#$%steven wang%$#@!", f)) // !@#$%steven wang
+}
+
+// 将字符串s首尾的空格去掉
+func TestTrimSpace() {
+	fmt.Println(strings.TrimSpace(" \t\n a lone gopher \n\t\r\n")) // a lone gopher
+}
+
+// 将字符串s的前缀prefix去掉
+func TestTrimPrefix() {
+	var s = "Goodbye, world!"
+	s = strings.TrimPrefix(s, "Goodbye")
+	fmt.Println(s) // , world!
+}
+
+// 将字符串s的后缀suffix去掉
+func TestTrimSuffix() {
+	var s = "Helllo,goodbye,etc"
+	s = strings.TrimSuffix(s, "goodbye,etc")
+	fmt.Println(s) // Helllo,
+}
+
+// 比较字符串
+// func Compare(a,b string)int // 按字典顺序比较a和b，如果a==b返回0，如果a<b返回-1，如果a>b返回1
+// func EqualFold(a,b string)bool // 比较a和b是否相等，忽略大小写
+// func Repeat(s string, count int) string // 将字符串s重复count次
+// func Replace(s, old, new string, n int) string // 将字符串s中的old替换为new，n表示替换的次数，如果n<0表示全部替换
+// func join(a []string, sep string) string // 将字符串切片a中的元素用sep连接起来，返回一个字符串
+func CompareString() {
+	TestCompare()
+	TestEqualFold()
+	TestRepeat()
+	TestReplace()
+	TestJoin()
+}
+
+// 按字典顺序比较a和b，如果a==b返回0，如果a<b返回-1，如果a>b返回1
+func TestCompare() {
+	fmt.Println(strings.Compare("abc", "bcd")) // -1
+	fmt.Println("abc" < "bcd")                 // true
+}
+
+// 比较a和b两个UTF-8字符串是否相等，忽略大小写
+func TestEqualFold() {
+	fmt.Println(strings.EqualFold("Go", "go")) // true
+}
+
+// 将字符串s重复count次
+func TestRepeat() {
+	fmt.Println("g" + strings.Repeat("o", 8) + "le") // gooooooooogle
+}
+
+// 替换字符串s中old字符串为new字符串，n表示替换的次数，如果n<0表示全部替换
+func TestReplace() {
+	fmt.Println(strings.Replace("王老大 王老二 王老三", "王", "李", 2))  // 李老大 李老二 王老三
+	fmt.Println(strings.Replace("王老大 王老二 王老三", "王", "李", -1)) // 李老大 李老二 李老三
+}
+
+// 将a中的所有字符串连接成一个字符串，使用字符串sep作为分隔符
+func TestJoin() {
+	s := []string{"abc", "ABC", "123"}
+	fmt.Println(strings.Join(s, ",")) // abc,ABC,123
+	fmt.Println(strings.Join(s, ""))  // abcABC123
 }
