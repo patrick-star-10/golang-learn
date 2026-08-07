@@ -126,5 +126,4 @@ func testRegexp() {
 	MyRegexp := regexp.MustCompile("#+")
 	arr := MyRegexp.Split(text, 5)
 	fmt.Println(arr)
-
 }
