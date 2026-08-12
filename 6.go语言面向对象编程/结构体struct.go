@@ -101,3 +101,33 @@ func SyntacticSugar() {
 	fmt.Println((*arr4)[len(arr)-1]) //400
 	//fmt.Println(arr4[0]) 会报错，不存在语法糖
 }
+
+// 结构体是值类型，在函数中对参数进行修改，不会影响到实际参数
+// 证明结构体是值类型
+type human struct {
+	name string
+	age  int8
+	sex  byte
+}
+
+func StructType() {
+	//1.初始化Human
+	h1 := human{"Steven", 35, 1}
+	fmt.Printf("h1:%T,%v,%p \n", h1, h1, &h1)
+	fmt.Println("----------------")
+	//2.复制结构体对象
+	h2 := h1
+	h2.name = "David"
+	h2.age = 30
+	fmt.Printf("h2修改后:%T,%v,%p \n", h2, h2, &h2)
+	fmt.Printf("h1:%T,%v,%p \n", h1, h1, &h1)
+	fmt.Println("-------------------")
+	//3.结构体对象作为参数传递
+	changeName(h1)
+	fmt.Printf("h1:%T,%v,%p \n", h1, h1, &h1)
+}
+func changeName(h human) {
+	h.name = "Daniel"
+	h.age = 13
+	fmt.Printf("函数体内修改后:%T,%v,%p \n", h, h, &h) // h是新的结构体，不影响h1
+}
