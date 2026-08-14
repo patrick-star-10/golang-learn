@@ -1,6 +1,9 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"math"
+)
 
 /*
 结构体的定义格式：
@@ -173,6 +176,248 @@ func DeepAndShallowCopy() {
 	fmt.Println("--------------")
 	d5.color = "金色"
 	d5.kind = "金毛"
-	fmt.Println("d5修改后: ", d5)
-	fmt.Println("d4: ", d4)
+	fmt.Println("d5修改后: ", d5) //d5修改后:  &{多多 金色 1 金毛}
+	fmt.Println("d4: ", d4)    //&{多多 金色 1 金毛}
+}
+
+// 结构体作为函数的参数以及返回值：值传递和引用传递
+// 结构体对象与指针在函数中的传递
+type Flower struct {
+	name, color string
+}
+
+func Rose() {
+	//1.结构体作为参数的用法
+	f1 := Flower{"玫瑰", "红"}
+	fmt.Printf("f1:%T,%v,%p \n", f1, f1, &f1)
+	fmt.Println("-------------------")
+	//将结构体对象作为参数
+	changeInfo1(f1)
+	fmt.Printf("f1:%T,%v,%p \n", f1, f1, &f1)
+	fmt.Println("-------------------")
+	// 将结构体指针作为参数
+	changeInfo2(&f1)
+	fmt.Printf("f1:%T,%v,%p \n", f1, f1, &f1)
+	fmt.Println("-------------------")
+	//2.结构体作为返回值的用法
+	f2 := getFlower1()
+	f3 := getFlower1()
+	fmt.Println("更改前", f2, f3)
+	fmt.Printf("f2地址为%p,f3地址为%p\n", &f2, &f3) //地址发生改变，对象发生了复制
+	f2.name = "杏花"
+	fmt.Println("更改后:", f2, f3)
+	//结构体指针作为返回值
+	f4 := getFlower2()
+	f5 := getFlower2()
+	fmt.Println("更改前:", f4, f5)
+	f4.name = "桃花"
+	fmt.Println("更改后:", f4, f5)
+}
+
+// 返回结构体对象
+func getFlower1() (f Flower) {
+	f = Flower{"牡丹", "白"}
+	fmt.Printf("函数getFlower1内f:%T,%v,%p \n", f, f, &f)
+	return
+}
+
+// 返回结构体指针
+func getFlower2() (f *Flower) {
+	temp := Flower{"芙蓉", "红"}
+	fmt.Printf("函数getFlower2内temp:%T,%v,%p \n", temp, temp, &temp)
+	f = &temp
+	fmt.Printf("函数getFlower2内f:%T,%v,%p,%p \n", f, f, f, &f)
+	return
+}
+
+// 传结构体对象
+func changeInfo1(f Flower) {
+	f.name = "月季"
+	f.color = "粉"
+	fmt.Printf("changeInfo1内f:%T,%v,%p \n", f, f, &f)
+}
+
+// 传结构体指针
+func changeInfo2(f *Flower) {
+	f.name = "蔷薇"
+	f.color = "紫"
+	fmt.Printf("changeInfo1内f:%T,%v,%p ,%p\n", f, f, f, &f)
+}
+
+/*
+	匿名结构体和匿名字段
+	匿名结构体就是没有名字的结构体，无需通过type关键字来定义就可以直接使用。
+	创建匿名结构体时，同时要创建对象，格式如下：
+	变量名 ：= struct{
+		定义成员属性
+	}{初始化成员属性}
+*/
+//匿名结构体
+func UnameStruct() {
+	//匿名函数
+	res := func(a, b float64) float64 {
+		return math.Pow(a, b)
+	}(2, 3)
+	fmt.Println(res)
+	// 匿名结构体
+	addr := struct {
+		province, city string
+	}{"陕西省", "西安市"}
+	fmt.Println(addr)
+	cat := struct {
+		name, color string
+		age         int8
+	}{
+		name:  "绒毛",
+		color: "黑白",
+		age:   1,
+	}
+	fmt.Println(cat)
+}
+
+/*
+	结构体的匿名字段
+	匿名字段就是在结构体中的字段没有名字，只包含一个没有字段名的类型。
+	如果字段没有名字，那么默认使用类型作为字段名，同一个类型只能有一个匿名字段。
+	结构体嵌套中采用匿名结构体字段可以模拟继承关系
+*/
+//匿名字段
+type User struct {
+	string
+	byte
+	int8
+	float64
+}
+
+func user() {
+	// 实例化结构体
+	user := User{"Steven", 'm', 35, 177.5}
+	fmt.Println(user)
+	//如果想依次输出姓名，年龄，性别，身高
+	fmt.Printf("姓名:%s\n", user.string)
+	fmt.Printf("身高:%2f \n", user.float64)
+	fmt.Printf("性别：%c \n", user.byte)
+	fmt.Printf("年龄:%d\n", user.int8)
+}
+
+/*
+	结构体嵌套
+	将一个结构体作为另一个结构体的属性(字段)，这种结构就是结构体嵌套
+	结构体嵌套可以模拟面向对象编程中的以下两种关系：
+	1.聚合关系：一个类作为另一个类的属性
+	2.继承关系：一个类作为另一个类的子类，子类和父类的关系
+*/
+//聚合关系
+type Address struct {
+	province, city string
+}
+type Person struct {
+	name    string
+	age     int
+	address *Address
+}
+
+func Aggregate() {
+	//模拟结构体对象之间的聚合关系
+	p := Person{}
+	p.name = "steven"
+	p.age = 35
+	//赋值方式1
+	addr := Address{}
+	addr.province = "北京市"
+	addr.city = "海淀区"
+	p.address = &addr
+	fmt.Println(p)
+	fmt.Println("姓名: ", p.name, "年龄: ", p.age, "省: ", p.address.province, "市区:", p.address.city)
+	fmt.Println("--------------------")
+	//修改Person对象的数据，是否会影响Address对象的数据？
+	p.address.city = "昌平区"
+	fmt.Println("姓名: ", p.name, "年龄: ", p.age, "省: ", p.address.province, "市区:", p.address.city)
+	fmt.Println("---------------------")
+	// 修改Address对象的数据，是否会影响Person对象的数据？
+	addr.city = "大兴区"
+	fmt.Println("姓名: ", p.name, "年龄: ", p.age, "省: ", p.address.province, "市区:", p.address.city)
+	fmt.Println("---------------------")
+	//赋值方式2
+	p.address = &Address{ // 创建了一个新的address对象
+		province: "陕西省",
+		city:     "西安市",
+	}
+	fmt.Println(p)
+	fmt.Println("姓名: ", p.name, "年龄: ", p.age, "省: ", p.address.province, "市区:", p.address.city)
+	fmt.Println("---------------------")
+}
+
+/*
+	继承
+	子类可以有自己的属性和方法，也可以重写父类已有的方法，子类可以直接访问父类的所有属性和方法
+	在结构体中，属于匿名结构体的字段称为提升字段，他们可以被访问，匿名结构体就像是该结构体的父类
+	采用匿名字段的形式就是模拟继承关系
+*/
+//结构体嵌套模拟继承关系
+type Person1 struct {
+	name string
+	age  int
+	sex  string
+}
+type Student struct {
+	Person1
+	schoolName string
+}
+
+func inherit() {
+	//1.实例化并且初始化Person2
+	p1 := Person1{"steven", 18, "男"}
+	fmt.Println(p1)
+	fmt.Println("--------------")
+	//2.实例化并且初始化Student
+	// 写法1：
+	s1 := Student{p1, "北航软件学院"}
+	printInfo(s1)
+	//写法2:
+	s2 := Student{Person1{"john", 30, "男"}, "北京大学"}
+	printInfo(s2)
+	//写法3；
+	s3 := Student{Person1: Person1{
+		name: "penn",
+		age:  19,
+		sex:  "男",
+	},
+		schoolName: "清华",
+	}
+	printInfo(s3)
+	//写法4:体现继承关系
+	s4 := Student{}
+	s4.name = "Daniel"
+	s4.sex = "男"
+	s4.age = 12
+	s4.schoolName = "野鸡大学"
+	printInfo(s4)
+}
+func printInfo(s1 Student) {
+	fmt.Println(s1)
+	fmt.Printf("%+v\n", s1)
+	fmt.Printf("姓名: %s, 年龄: %d, 性别:%s, 学校: %s\n", s1.name, s1.age, s1.sex, s1.schoolName)
+	fmt.Println("---------------------")
+}
+
+// 结构体嵌套时，可能存在相同的成员名，成员重名会导致成员名字冲突
+type A struct {
+	a, b int
+}
+type B struct {
+	a, d int
+}
+type C struct {
+	A
+	B
+}
+
+func conflict() {
+	c := C{}
+	c.A.a = 1
+	c.B.a = 2 //如果调用c.a = 2则会提示“引起歧义的参数”
+	c.b = 3
+	c.d = 4
+	fmt.Println(c)
 }
