@@ -86,4 +86,74 @@ func (c Circle) Area() float64 {
 func PointerReceiver() {
 	r1 := Rectangle{5, 8}
 	r2 := r1
+	// 打印对象的内存地址
+	fmt.Printf("r1的地址:%p\n ", &r1)
+	fmt.Printf("r2的地址:%p\n ", &r2)
+	r1.setValue()
+	fmt.Println("r1.height=", r1.height)
+	fmt.Println("r2.height=", r2.height)
+	fmt.Println("-------------")
+	r1.setValue2()
+	fmt.Println("r1.height=", r1.height)
+	fmt.Println("r2.height=", r2.height)
+	fmt.Println("-------------")
+
 }
+func (r Rectangle) setValue() {
+	fmt.Printf("setValue方法中r的地址:%p\n", &r)
+	r.height = 10
+}
+func (r *Rectangle) setValue2() {
+	fmt.Printf("setValue2中r的地址:%p \n", &r)
+	r.height = 20
+	fmt.Printf("r指向的地址: %p\n", r)
+}
+
+/*
+	方法继承
+	方法是可以继承的，如果匿名字段实现了一个方法，那么包含这个匿名字段的struct也能调用匿名字段中的方法
+*/
+// 方法继承案例
+type Human struct {
+	name, phone string
+	age         int
+}
+type Student2 struct {
+	Human  //匿名字段
+	school string
+}
+type Employee2 struct {
+	Human   //匿名字段
+	company string
+}
+
+func inheritMethod() {
+	s1 := Student2{Human{"Daniel", "123456789", 13}, "野鸡小学"}
+	e1 := Employee2{Human{"steven", "987654321", 34}, "1000phone"}
+	s1.SayHi()
+	e1.SayHi()
+}
+func (h *Human) SayHi() {
+	fmt.Printf("大家好!我是%s,我%d岁,我的联系方式是:%s\n", h.name, h.age, h.phone)
+}
+
+/*
+	方法重写：
+	在go语言中，方法重写是指一个包含了匿名字段的struct也实现了该匿名字段实现的方法
+*/
+//方法重写案例
+func MethodRewrite() {
+	s1 := Student2{Human{"Daniel", "123456789", 13}, "野鸡小学"}
+	e1 := Employee2{Human{"steven", "987654321", 34}, "1000phone"}
+	s1.SayHi()
+	e1.SayHi()
+}
+func (s *Student2) SayHi() {
+	fmt.Printf("大家好!我是%s,我%d岁,我在%s上学,联系方式:%s\n", s.name, s.age, s.school, s.phone)
+}
+func (e *Employee2) SayHi() {
+	fmt.Printf("大家好!我是%s,我%d岁,我在%s工作,联系方式:%s\n", e.name, e.age, e.company, e.phone)
+}
+
+// 结构体会优先调用自己实现的同名方法；
+// 如果没有实现，则会调用匿名嵌入（模拟继承）结构体的方法。
