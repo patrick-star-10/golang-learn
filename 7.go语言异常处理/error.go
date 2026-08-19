@@ -65,3 +65,42 @@ func Divide(dividee float64, divider float64) (float64, error) {
 		return dividee / divider, nil
 	}
 }
+
+/*
+	创建error对象：
+	结构体只要实现了Error()string这种格式的方法，就代表实现了该错误接口，返回值为错误的具体描述
+	通常程序会发生可预知错误，所以errors包对外提供了自定义方法
+*/
+//自定义创建error案例
+func selfError() {
+	//1.创建error对象的方式1
+	err1 := errors.New("自己创建的错误!")
+	fmt.Println(err1.Error())
+	fmt.Println(err1)
+	fmt.Printf("err1的类型:%T\n", err1) // *errors.errorsStirng
+	fmt.Println("--------------")
+	//2.创建error对象的方式2
+	err2 := fmt.Errorf("错误的类型%d", 10) //能格式化打印错误
+	fmt.Println(err2.Error())
+	fmt.Println(err2)
+	fmt.Printf("err2的类型:%T\n", err2) // *errors.errorsStirng
+	fmt.Println("--------------")
+	//error对象在函数中的使用
+	res, err3 := checkAge(-12)
+	if err3 != nil {
+		fmt.Println(err3.Error())
+		fmt.Println(err3)
+	} else {
+		fmt.Println(res)
+	}
+}
+
+// 设计一个函数验证年龄，如果是负数，则返回error
+func checkAge(age int) (string, error) {
+	if age < 0 {
+		err := fmt.Errorf("您的输入年龄是:%d,该数值为负数，有错误!", age)
+		return "", err
+	} else {
+		return fmt.Sprintf("您的年龄输入是:%d ", age), nil
+	}
+}
