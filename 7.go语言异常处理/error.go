@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math"
 	"os"
+	"time"
 )
 
 /*
@@ -102,5 +103,49 @@ func checkAge(age int) (string, error) {
 		return "", err
 	} else {
 		return fmt.Sprintf("您的年龄输入是:%d ", age), nil
+	}
+}
+
+/*
+	自定义错误
+	·自定义一个结构体，表示自定义的错误类型
+	·让自定义错误类实现error接口：Error()string
+	·定义一个返回error的函数
+*/
+//自定义错误示例
+
+// 1.定义结构体，表示自定义错误类型
+type MyError struct {
+	When time.Time
+	What string
+}
+
+// 2.实现Error()方法
+func (e MyError) Error() string {
+	return fmt.Sprintf("%v:%v", e.When, e.What)
+}
+
+// 3.定义函数,返回error对象，该函数求矩形面积
+func getAera(width, length float64) (float64, error) {
+	errorInfo := ""
+	if width < 0 && length < 0 {
+		errorInfo = fmt.Sprintf("长度:%v,宽度:%v,均为负数", length, width)
+	} else if length < 0 {
+		errorInfo = fmt.Sprintf("长度:%v,出现负数", length)
+	} else if width < 0 {
+		errorInfo = fmt.Sprintf("宽度:%v,出现负数", width)
+	}
+	if errorInfo != "" {
+		return 0, MyError{time.Now(), errorInfo}
+	} else {
+		return width * length, nil
+	}
+}
+func SelfError() {
+	res, err := getAera(-4, -5)
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		fmt.Println("面积为:", res)
 	}
 }
