@@ -1,5 +1,5 @@
 package main
 
 func main() {
-	deferTurn2()
+	deferInmethod()
 }

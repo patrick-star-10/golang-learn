@@ -52,3 +52,17 @@ func getLargest(s []int) {
 	}
 	fmt.Printf("%v中最大数为:%v\n", s, max)
 }
+
+// 方法中使用defer
+type person struct {
+	firstName, lastName string
+}
+
+func (p person) fullName() {
+	fmt.Printf("%s %s\n", p.firstName, p.lastName)
+}
+func deferInmethod() {
+	p := person{"steven", "Wang"}
+	defer p.fullName()
+	fmt.Print("Wellcome ")
+}
