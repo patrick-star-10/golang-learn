@@ -47,3 +47,44 @@ func MAIN() {
 	Test2(101) //Test2()发生异常，中断程序
 	Test3()
 }
+
+/*
+	go语言为开发者提供了专用于拦截运行时panic的内建函数recover()
+	recover()可以让进入恐慌流程的Goroutine恢复过来并重新获得流程控制权
+	需要注意的是，recover()让程序恢复，必须在延迟函数中执行。换而言之，revover仅在延迟函数中有效
+	在正常的程序运行过程中，调用recover()会返回nil,并且没有其他任何效果。
+	如果当前的Goroutine陷入恐慌，调用recover()可以捕获panic()的输入值，使程序恢复正常运行
+*/
+// recover示例
+func TEST() {
+	funca()
+	funcb()
+	funcc()
+	fmt.Println("main over")
+}
+func funca() {
+	fmt.Println("这是funca")
+}
+func funcb() {
+	defer func() {
+		if msg := recover(); msg != nil {
+			fmt.Println("恢复啦,获取recover的返回值", msg)
+		}
+	}()
+	fmt.Println("这是funcb")
+	for i := 0; i < 10; i++ {
+		fmt.Println("i:", i)
+		if i == 5 {
+			//panic("funcb恐慌了")
+		}
+	}
+}
+func funcc() {
+	defer func() {
+		fmt.Println("执行延迟函数")
+		msg := recover()
+		fmt.Println("获取recover的返回值: ", msg)
+	}()
+	fmt.Println("这是funcc")
+	panic("func恐慌了")
+}
