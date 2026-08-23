@@ -86,3 +86,20 @@ func printAdd(a, b int, flag bool) {
 		fmt.Printf("未延迟执行函数printAdd(),参数a,b分别为%d,%d,两数之和为:%d\n", a, b, a+b)
 	}
 }
+
+/*
+	堆栈的推迟
+	当一个函数有多个延迟调用时，他们被添加到一个堆栈中，并按后进先出的顺序执行
+*/
+//利用defer实现字符串倒序
+func stringTrun() {
+	str := "Steven欢迎大家学习区块链"
+	fmt.Printf("原始字符串:\n%s\n", str)
+	fmt.Println("翻转后的字符串: ")
+	ReverseString(str)
+}
+func ReverseString(str string) {
+	for _, v := range []rune(str) {
+		defer fmt.Printf("%c", v)
+	}
+}
