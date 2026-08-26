@@ -56,4 +56,22 @@ func running() {
 		fmt.Println("tick", times)
 		time.Sleep(time.Second)
 	}
+	// 控制台不断输出tick,同时还可以接收用户输入，两个环节同时进行
+}
+
+/*
+匿名函数创建gotoutine
+go关键字后也可以是匿名函数或闭包
+*/
+func example4() {
+	go func() {
+		var times int
+		for {
+			times++
+			fmt.Println("tick", times)
+			time.Sleep(time.Second)
+		}
+	}()
+	var input int
+	fmt.Scanln(&input)
 }
