@@ -75,3 +75,23 @@ func example4() {
 	var input int
 	fmt.Scanln(&input)
 }
+
+// 启动多个Goroutine
+func example5() {
+	go printNum()
+	go printLetter()
+	time.Sleep(3 * time.Second)
+	fmt.Println("\nmain over....")
+}
+func printNum() {
+	for i := 1; i < 5; i++ {
+		time.Sleep(250 * time.Microsecond)
+		fmt.Printf("%d", i)
+	}
+}
+func printLetter() {
+	for i := 'a'; i <= 'e'; i++ {
+		time.Sleep(400 * time.Microsecond)
+		fmt.Printf("%c", i)
+	}
+} //多个goroutine随机调度，打印的结果是数字与字母交叉输出(无序)
