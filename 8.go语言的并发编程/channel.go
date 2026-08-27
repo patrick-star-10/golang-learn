@@ -122,4 +122,33 @@ func block() {
 	ch1 <- 10
 	<-ch2 //阻塞
 	fmt.Println("main over...")
+	// <-ch2的作用就是阻塞，等待匿名函数的goroutine运行结束，防止主函数退出导致goroutine提前退出
+}
+
+/*
+	关闭channel
+	发送方如果数据写入完毕，需要关闭channel，用于通知接收方数据传递完毕。
+	通常情况是发送方主动关闭channel,接收方通过多重返回值判断channel是否关闭，返回false表示关闭
+	往关闭的channel中写入数据会报错，但是可以从关闭的channel中读取数据，返回数据的默认值是false
+*/
+//channel关闭以后是否可以写入数据案例
+func CloseChannel() {
+	// channel关闭后是否可以写入数据？
+	ch1 := make(chan int)
+	go func() {
+		ch1 <- 100
+		ch1 <- 200
+		close(ch1)
+		ch1 <- 10 //关闭的channel，无法写入数据
+	}()
+	data, ok := <-ch1
+	fmt.Println("main读取数据: ", data, ok)
+	data, ok = <-ch1
+	fmt.Println("main读取数据: ", data, ok)
+	data, ok = <-ch1
+	fmt.Println("main读取数据: ", data, ok)
+	data, ok = <-ch1
+	fmt.Println("main读取数据: ", data, ok)
+	data, ok = <-ch1
+	fmt.Println("main读取数据: ", data, ok)
 }
