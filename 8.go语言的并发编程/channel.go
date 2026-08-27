@@ -99,3 +99,27 @@ func sendData(ch1 chan string) {
 	fmt.Println("发送数据完毕")
 	//显示调用close()实现关闭通道
 }
+
+/*
+	阻塞
+	channel默认是阻塞的。当数据被发送到channel时会发生阻塞，知道有其他goroutine从这个channel中读取数据
+	当从channel中读取数据时，读取也会被阻塞，直到其他goroutine将数据写入该channel
+	这些channel的特性帮助goroutine有效地通信，而不需要使用其他语言中的显式锁或条件变量
+*/
+//阻塞的基本用法
+func block() {
+	var ch1 chan int
+	ch1 = make(chan int)
+	fmt.Printf("%T\n", ch1)
+	ch2 := make(chan bool)
+	go func() {
+		data, ok := <-ch1
+		if ok {
+			fmt.Println("子goroutine取到数值: ", data)
+		}
+		ch2 <- true
+	}()
+	ch1 <- 10
+	<-ch2 //阻塞
+	fmt.Println("main over...")
+}
