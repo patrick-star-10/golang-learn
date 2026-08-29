@@ -1,5 +1,5 @@
 package main
 
 func main() {
-	Channel2()
+	SingalChannel()
 }

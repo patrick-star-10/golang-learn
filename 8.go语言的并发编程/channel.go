@@ -241,4 +241,62 @@ func consumer(num int, ch1 chan int, ch chan bool) {
 	}
 	ch <- true
 	defer close(ch)
+	/*
+	   生产者—消费者模型：使用 channel 作为生产者和消费者之间的数据通道。生产者负责向 channel 发送数据，
+	   多个消费者并发地从 channel 接收数据，每条数据只会被一个消费者处理。close(channel)
+	   用于通知消费者数据已全部发送完毕，消费者退出后再通知主 goroutine，从而实现多个 goroutine 之间安全、
+	   高效的协作，无需使用互斥锁（Mutex）维护共享队列
+	*/
 }
+
+/*
+	单向channel
+	channel默认都是双向的，即可读可写。定向channel也叫单向channel，只读，或只写
+	只读channel使用方式如下所示：
+	make(<- chan type)
+	<-chan
+	只写channel使用方式如下：
+	make(chan<- type)
+	chan <- data
+	直接创建单向channel没有任何意义。通=通常的做法是创建双向channel，然后以单向channel的
+	方式进行函数传递
+*/
+
+func SingalChannel() {
+	//双向通道
+	ch1 := make(chan string)
+	go fun1(ch1)
+	data := <-ch1
+	fmt.Println("main,接收到数据: ", data)
+	ch1 <- "区块链"
+	ch1 <- "以太坊"
+	go fun2(ch1)
+	go fun3(ch1)
+	time.Sleep(1 * time.Second)
+	fmt.Println("main over")
+
+}
+func fun1(ch1 chan string) {
+	ch1 <- "我是steven老师"
+	data := <-ch1
+	data2 := <-ch1
+	fmt.Println("回应: ", data, data2)
+}
+
+// 功能；只有写入数据
+func fun2(ch1 chan<- string) {
+	//只能写入
+	ch1 <- "how are you"
+}
+
+// 功能：只有读取数据
+func fun3(ch1 <-chan string) {
+	data := <-ch1
+	fmt.Println("只读: ", data)
+}
+
+/*
+单向 Channel：Go 可以将双向 channel 限制为发送专用（chan<- T）或接收专用（<-chan T）。
+发送专用只能写入数据，接收专用只能读取数据，违反限制会在编译时报错。单向 channel 并不会创建新的通道，
+而是对同一个 channel 进行权限限制，使函数职责更清晰、代码更安全，避免误操作
+*/
