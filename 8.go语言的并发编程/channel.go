@@ -1,6 +1,11 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"math/rand"
+	"strings"
+	"time"
+)
 
 /*
 	channel的概述
@@ -151,4 +156,89 @@ func CloseChannel() {
 	fmt.Println("main读取数据: ", data, ok)
 	data, ok = <-ch1
 	fmt.Println("main读取数据: ", data, ok)
+	//由运行结果可知，向已关闭的channel写入数据会导致程序崩溃
+}
+
+/*
+	缓冲channel
+	默认创建的都是非缓冲channel，读写都是即使阻塞。
+	缓存channel自带一块缓冲区，可以暂时存储数据，如果缓冲区满了，就会发生阻塞
+*/
+// 缓存channel案例
+func Channel2() {
+	//1.非缓冲channel
+	ch1 := make(chan int)
+	fmt.Println("非缓冲通道", len(ch1), cap(ch1))
+	go func() {
+		data := <-ch1
+		fmt.Println("获得数据: ", data)
+	}()
+	ch1 <- 100
+	time.Sleep(time.Second)
+	fmt.Println("赋值ok", "main over...")
+	//2.非缓冲通道
+	ch2 := make(chan string)
+	go sendData2(ch2)
+	for data := range ch2 {
+		fmt.Println("\t读取数据", data)
+	}
+	fmt.Println("main over...")
+	//3.缓冲通道，缓冲区满了才会阻塞
+	ch3 := make(chan string, 6)
+	go sendData2(ch3)
+	for data := range ch3 {
+		fmt.Println("\t读取数据", data)
+	}
+	fmt.Println("main over...")
+}
+func sendData2(ch chan string) {
+	for i := 1; i <= 3; i++ {
+		ch <- fmt.Sprintf("data%d", i)
+		fmt.Println("往通道放入数据: ", i)
+	}
+	defer close(ch)
+	// 无缓冲 Channel 能保证数据的发送和接收必须完成交接，但不能保证交接完成后，发送方和接收方各自的 Println 谁先执行。
+	// 缓冲 Channel 因为发送不必等待接收，所以发送方常常能连续跑完，看起来更有序，
+	// 但这种打印顺序本身依然不是 Channel 保证的
+}
+
+// 缓冲channel模拟生产者和消费者
+func CHANNEL() {
+	//用channel来传递数据，不再需要自己去加锁维护一个全局的阻塞列队
+	ch1 := make(chan int)
+	ch_bool1 := make(chan bool) //判断结束
+	ch_bool2 := make(chan bool) //判断结束
+	ch_bool3 := make(chan bool) //判断结束
+	rand.Seed(time.Now().UnixNano())
+	// 生产者
+	go producer(ch1)
+	//消费者
+	go consumer(1, ch1, ch_bool1)
+	go consumer(2, ch1, ch_bool2)
+	go consumer(3, ch1, ch_bool3)
+	<-ch_bool1
+	<-ch_bool2
+	<-ch_bool3
+	defer fmt.Println("main...over")
+}
+
+// 生产者
+func producer(ch1 chan int) {
+	for i := 1; i <= 10; i++ {
+		ch1 <- i
+		fmt.Println("生成蛋糕,编号为: ", i)
+		time.Sleep(time.Duration(rand.Intn(500)) * time.Millisecond)
+	}
+	defer close(ch1)
+}
+
+// 消费者
+func consumer(num int, ch1 chan int, ch chan bool) {
+	for data := range ch1 {
+		pre := strings.Repeat("--------", num)
+		fmt.Printf("%s %d号购买%d号蛋糕 \n", pre, num, data)
+		time.Sleep(time.Duration(rand.Intn(100)) * time.Millisecond)
+	}
+	ch <- true
+	defer close(ch)
 }
