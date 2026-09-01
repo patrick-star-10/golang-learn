@@ -125,3 +125,49 @@ func rwMutex() {
 	// 只要还有读锁 RLock() 没有被 RUnlock() 释放，写锁 Lock() 就无法获得，会阻塞等待
 	// 如果写锁已经被某个 goroutine 持有，那么其他 goroutine 想 RLock() 读取，也会阻塞，直到写锁释放。
 }
+
+/*
+	条件变量
+	Cond实现了一个条件变量，一个goroutine集合地，供goroutine等待或者宣布某事件的发生
+	每个Cond实例都有一个相关的锁，必须在改变条件时或者调用Wait()时保持锁定
+	Cond可以被创建为其他结构体的字段，Cond在开始使用后不能被复制
+	条件变量Cond时多个goroutine等待或接收通知的集合地
+	Cond中的方法如下：
+	func NewCond(1 Locker)*Cond
+	使用锁1创建一个*Cond.Cond条件变量总是要结合锁使用
+	func(c *Cond)Broadcast()
+	Broadcast()唤醒所有等待c的goroutine
+	func(c *Cond) Singal()
+	Singal()唤醒等待c的一个goroutine
+	func(c *Cond) Wait()
+	Wait()自行解锁c.L并阻塞当前goroutine,待线程恢复执行时，Wait()会在返回前锁定c.L
+	和其他系统不同，Wait()除非被Brocast()或者Signal()唤醒，否则不回主动返回
+*/
+// 条件变量案例
+func CondExample() {
+	var mutex sync.Mutex
+	cond := sync.Cond{L: &mutex}
+	condition := false
+	go func() {
+		time.Sleep(1 * time.Second)
+		cond.L.Lock()
+		fmt.Println("子goroutine已锁定。。。")
+		fmt.Println("子goroutine更改条件数值,并发送通知。。")
+		condition = true
+		cond.Signal() //发送通知，通知一个goroutine
+		fmt.Println("子goroutine...继续...")
+		time.Sleep(5 * time.Second)
+		fmt.Println("子goroutine解锁")
+		cond.L.Unlock()
+	}()
+	cond.L.Lock()
+	fmt.Println("main..已经锁定")
+	if !condition {
+		fmt.Println("main..即将等待")
+		cond.Wait()
+		fmt.Println("main.被唤醒")
+	}
+	fmt.Println("main...继续")
+	fmt.Println("main..解锁")
+	cond.L.Unlock()
+}
