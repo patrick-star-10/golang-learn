@@ -146,7 +146,7 @@ func rwMutex() {
 // 条件变量案例
 func CondExample() {
 	var mutex sync.Mutex
-	cond := sync.Cond{L: &mutex}
+	cond := sync.NewCond(&mutex)
 	condition := false
 	go func() {
 		time.Sleep(1 * time.Second)
