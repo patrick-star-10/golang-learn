@@ -77,10 +77,51 @@ func saleTickets(name string, wg *sync.WaitGroup) {
 			tickets--
 		} else {
 			fmt.Printf("%s结束售票\n", name)
-			mutex.Unlock()
+			mutex.Unlock() //票没了，但是前面gotoutine进来的时候上锁了，如果不unlock,程序就会阻塞，报错
 			break
 		}
 		//解锁
 		mutex.Unlock()
 	}
+}
+
+/*
+	读写互斥锁
+	RWMutex是读写互斥锁。该锁可以同时被多个读取者持有或被唯一一个写入者持有
+	RWMutex可以创建为其结构体的字段；零值为解锁状态，和goroutine也无关，可以由不同的goroutine加读取锁/写入锁
+	读写锁的使用中，写操作都是互斥的，读和写诗互斥的，读和读不互斥
+	该规则可以理解为，多个goroutine可以同时读取数据，但是只能一个goroutine写入数据
+	具体方法：
+	func(rw*RWMutex)Lock()
+	Lock()方法将rw锁定义为写入状态，禁止其他goroutine读取或写入
+	func(rw*RWMutex)Unlock()
+	Unlock()方法解除rw的写入锁，如果rw未加写入锁会导致运行错误
+	func(rw*RWMutex)RLock()
+	Rlock()方法将rw锁定为读取状态，禁止其他goroutine写入，但不禁止读取
+	func(rw*RWMutex)RUnlock()
+	RUnlock()方式解除rw的读取锁，如果rw未加读取锁会导致运行时错误
+	func(rw*RWMutex)RLocker() Locker
+	Rlocker()方法返回一个读写锁,通过调用rw.Rlock()和rw.RUnlock()实现了Locker接口
+*/
+//读写锁使用案例
+func rwMutex() {
+	var rwm sync.RWMutex
+	for i := 1; i <= 3; i++ {
+		go func(i int) {
+			fmt.Printf("goroutine%d,尝试读锁定。\n", i)
+			rwm.RLock()
+			fmt.Printf("goroutine%d,已经读锁定了\n", i)
+			time.Sleep(5 * time.Second)
+			fmt.Printf("goroutine %d,读解锁。。\n", i)
+			rwm.RUnlock()
+		}(i)
+	}
+	time.Sleep(1 * time.Second)
+	fmt.Println("main..尝试写锁定")
+	rwm.Lock()
+	fmt.Println("main。。已经写锁定了。。")
+	rwm.Unlock()
+	fmt.Println("main..写解锁。。")
+	// 只要还有读锁 RLock() 没有被 RUnlock() 释放，写锁 Lock() 就无法获得，会阻塞等待
+	// 如果写锁已经被某个 goroutine 持有，那么其他 goroutine 想 RLock() 读取，也会阻塞，直到写锁释放。
 }
